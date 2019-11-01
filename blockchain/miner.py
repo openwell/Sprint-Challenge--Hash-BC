@@ -2,6 +2,7 @@ import hashlib
 import requests
 
 import sys
+import json
 
 from uuid import uuid4
 
@@ -24,10 +25,13 @@ def proof_of_work(last_proof):
     start = timer()
 
     print("Searching for next proof")
-    proof = 0
+    proof = random.random()
     #  TODO: Your code here
-
     print("Proof found: " + str(proof) + " in " + str(timer() - start))
+    # block = json.dumps(last_proof, sort_keys=True).encode()
+    while valid_proof(last_proof, proof) is False:
+        proof += 1
+
     return proof
 
 
@@ -40,7 +44,12 @@ def valid_proof(last_hash, proof):
     """
 
     # TODO: Your code here!
-    pass
+    # set a guess
+    # hash the guess
+    last_proof = hashlib.sha256(str(last_hash).encode()).hexdigest()
+    guess_proof = hashlib.sha256(str(proof).encode()).hexdigest()
+    # return guess validity
+    return guess_proof[:6] == last_proof[-6:]
 
 
 if __name__ == '__main__':
@@ -48,12 +57,12 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         node = sys.argv[1]
     else:
-        node = "https://lambda-coin.herokuapp.com/api"
+        node = "https://lambda-coin-test-1.herokuapp.com/api"
 
     coins_mined = 0
 
     # Load or create ID
-    f = open("my_id.txt", "r")
+    f = open("blockchain/my_id.txt", "r")
     id = f.read()
     print("ID is", id)
     f.close()
@@ -62,14 +71,20 @@ if __name__ == '__main__':
         print("ERROR: You must change your name in `my_id.txt`!")
         exit()
     # Run forever until interrupted
+    print("Starting miner")
     while True:
         # Get the last proof from the server
         r = requests.get(url=node + "/last_proof")
-        data = r.json()
+        try:
+            data = r.json()
+        except ValueError:
+            print("Error:  Non-json response")
+            print("Response returned:")
+            print(r)
+            break
         new_proof = proof_of_work(data.get('proof'))
 
-        post_data = {"proof": new_proof,
-                     "id": id}
+        post_data = {"proof": new_proof, "id": id}
 
         r = requests.post(url=node + "/mine", json=post_data)
         data = r.json()
