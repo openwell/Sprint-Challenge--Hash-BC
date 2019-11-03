@@ -11,24 +11,36 @@ class Ticket:
         self.source = source
         self.destination = destination
 
-
 def reconstruct_trip(tickets, length):
     ht = HashTable(length)
     route = [None] * length
 
-    """
+    """ 
     YOUR CODE HERE
     """
-    for i in range(length): # 1
-        hash_table_insert(ht, tickets[i].source, tickets[i].destination )
+    for i in range(length):
+        hash_table_insert(ht, tickets[i].source, tickets[i].destination)
 
-    first_item = hash_table_retrieve(ht, "NONE") # 2
-    route[0] = first_item # 3
+    first = hash_table_retrieve(ht, 'NONE')
+    route[0] = first
 
-    for i in range(1, length): # 4
-        next_item = hash_table_retrieve(ht, route[i-1]) # 5
-        # if next_item != 'NONE':
-        route[i] = next_item # 6
-        print("Updated Route: ", route)
+    for i in range(1, length):
+        data = hash_table_retrieve(ht, route[i-1])
+        route[i] = data
 
-    return route # 7
+    return route
+# it was simple you just have to assume its not hard.
+# and dont over think it. the trick is in the table and getting the first
+# one. which then gets the others
+
+ticket_1 = Ticket("NONE", "PDX")
+ticket_2 = Ticket("PDX", "DCA")
+ticket_3 = Ticket("DCA", "NONE")
+
+tickets = [ticket_1, ticket_2, ticket_3]
+output = reconstruct_trip(tickets, len(tickets))
+
+print(output)
+
+
+

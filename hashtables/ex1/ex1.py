@@ -9,7 +9,7 @@ from hashtables import (HashTable,
 def get_indices_of_item_weights(weights, length, limit):
     ht = HashTable(16)
 
-    for i in range(length-1):
+    for i in range(length):
         hash_table_insert(ht, i, weights[i])
     
     # loop through all nos to find the write addition
@@ -20,7 +20,7 @@ def get_indices_of_item_weights(weights, length, limit):
             value1 = hash_table_retrieve(ht, i)
             value2 = hash_table_retrieve(ht, j)
             if value1 + value2 == limit:
-                print(value1,value2)
+                # print(value1,value2)
                 if value1 == value2:
                     return (max(i, j), min(i, j))
                 # if value1 < value2:
